@@ -2,6 +2,16 @@
 
 This repository contains a C++20-based Digital Signal Processing engine designed for real-time radar pulse compression and target detection. It features a complete Software-in-the-Loop (SIL) simulation environment and a highly optimized, concurrent DSP core targeting microsecond latency.
 
+## Problem Statement & Motivation
+
+Modern radar systems face a fundamental physics challenge dictated by the radar equation: the energy of an electromagnetic pulse attenuates proportionally to the inverse fourth power of the target distance ($1/R^4$). Consequently, the reflected echo is exceedingly weak, often returning with a Signal-to-Noise Ratio (SNR) far below 0 dB. The target signal is completely submerged in Additive White Gaussian Noise (AWGN) and thermal interference from the receiver hardware.
+
+Furthermore, physical hardware constraints prevent transmitting a pulse that is simultaneously short (for high range resolution) and high-power (to maximize detection range) without causing dielectric breakdown in the transmitter. To circumvent this, systems transmit long Linear Frequency Modulated (LFM) "chirp" pulses. However, this creates a new problem: the received echo is temporally smeared, making it impossible to determine the precise location of the target using simple threshold detection.
+
+This repository implements a high-performance Digital Signal Processing (DSP) solution to this problem known as **Pulse Compression** (or Matched Filtering). By continuously performing mathematical cross-correlation between the known transmitted pulse and the noisy received signal, the smeared echo is compressed into a sharp, narrow peak, effectively pulling the hidden target out of the noise floor.
+
+Because modern Active Electronically Scanned Arrays (AESA) and automotive radar sensors capture millions of samples per second, this complex operation—shifting from the time domain to the frequency domain via Fast Fourier Transforms (FFT)—must be executed under microsecond-level hard real-time deadlines. Failure to process this data stream efficiently results in dropped frames and catastrophic detection latency. This project demonstrates how applying Data-Oriented Design (DoD), cache-friendly memory layouts, and lock-free concurrency in C++20 can fulfill these stringent computational demands.
+
 ## Architecture and Execution Flow
 
 ```mermaid
